@@ -79,7 +79,7 @@ public class VillageBuilding implements Listener {
 				return;
 			}
 			if (v != null) {
-				List<Integer> prefix = new ArrayList<>(Arrays.asList(2, 3, 4, 5));
+				List<Integer> prefix = new ArrayList<>(Arrays.asList(2, 3, 4));
 				Inhabitant in = v.getInhabitant(p.getName());
 				if (prefix.contains(in.getCurrentObjective())) {
 					if (!v.getObjective(in.getCurrentObjective()).isCompleted()) {

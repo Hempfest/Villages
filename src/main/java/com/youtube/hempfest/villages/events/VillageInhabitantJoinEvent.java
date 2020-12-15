@@ -11,6 +11,7 @@ import com.youtube.hempfest.villages.apicore.entities.Inhabitant;
 import com.youtube.hempfest.villages.apicore.entities.Village;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -100,6 +101,7 @@ public class VillageInhabitantJoinEvent extends ClanEventBuilder implements Canc
 		village.acceptInvite(getInvite());
 		village.complete();
 		village.sendMessage("&a&oPlayer " + invited.getName() + " is now an inhabitant of our village.");
+		Bukkit.dispatchCommand(invited, "v motd");
 	}
 
 }

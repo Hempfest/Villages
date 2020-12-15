@@ -32,6 +32,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class AbilityUse implements Listener {
@@ -111,11 +112,10 @@ public class AbilityUse implements Listener {
 								Objective o = v.getObjective(6);
 								if (!o.isCompleted()) {
 									if (o.completionPercentage() < 100.00) {
-										e.setCancelled(true);
 										if (e.getEntity() instanceof Monster) {
 											Zombie z = (Zombie) e.getEntity();
 											double health = z.getHealth();
-											z.setHealth(health - 0.5);
+											e.setDamage(0.5);
 										}
 									}
 								}
@@ -171,6 +171,12 @@ public class AbilityUse implements Listener {
 											v.getInhabitant(p.getName()).setObjective(0);
 											v.complete();
 											v.sendMessage("&e&lObjective &f(&b" + o.getLevel() + "&f) &f{&3&lCOMPLETE&f}");
+											for (Inhabitant i : v.getInhabitants()) {
+												if (i.getUser().isOnline()) {
+													i.getUser().getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(Clan.clanUtil.color("&3&lVillage &alevel up. &f(&a" + v.getLevel() + "&f)")));
+													i.getUser().getPlayer().playSound(i.getUser().getPlayer().getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 5, 1);
+												}
+											}
 										}
 									}
 								}
@@ -232,6 +238,7 @@ public class AbilityUse implements Listener {
 							}
 
 							if (o.completionPercentage() == 100.00) {
+								p.getInventory().setItemInMainHand(new ItemStack(Material.AIR));
 								o.setCompleted(true);
 								v.getInhabitant(p.getName()).completed(7);
 								v.getInhabitant(p.getName()).setObjective(0);

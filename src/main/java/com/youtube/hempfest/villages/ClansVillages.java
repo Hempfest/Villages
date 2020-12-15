@@ -69,6 +69,16 @@ public final class ClansVillages extends JavaPlugin {
 		scepter.setItem('T', Item.bladeItem());
 		scepter.recipeShape("TGT", "GMG", "TGT");
 		scepter.register();
+		/** ------------ \/ TRIDENT \/--------------*/
+		Item trident = new Item(Material.TRIDENT, "&3&lTRUSTY VILLAGE TRIDENT");
+		trident.setKey("trusty_village_trident");
+		trident.makeItem();
+		trident.addEnchant(Enchantment.VANISHING_CURSE, 1);
+		trident.setItem('M', new ItemStack(Material.TRIDENT));
+		trident.setItem('O', new ItemStack(Material.AIR));
+		trident.setItem('G', Item.bladeItem());
+		trident.recipeShape("OGO", "GMG", "OGO");
+		trident.register();
 		/** ------------ \/ WARRIOR \/--------------*/
 		Item greatSword = new Item(Material.DIAMOND_SWORD, "&b&lWARRIOR'S BLADE OF JUDGEMENT");
 		greatSword.setKey("warriors_blade_of_judgement");

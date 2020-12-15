@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 public class Village implements Serializable {
@@ -59,6 +60,8 @@ public class Village implements Serializable {
 	private double villageBank;
 
 	private double lateTax = 0.01;
+
+	private ItemStack motdBook;
 
 	public Village(String clanID) {
 		this.id = HUID.randomID();
@@ -135,6 +138,14 @@ public class Village implements Serializable {
 
 	public void takeMoney(double amount) {
 		instance.villageBank -= amount;
+	}
+
+	public void setMotdBook(ItemStack book) {
+		this.motdBook = book;
+	}
+
+	public ItemStack getMotdBook() {
+		return motdBook;
 	}
 
 	public double getVillageBankBalance() {

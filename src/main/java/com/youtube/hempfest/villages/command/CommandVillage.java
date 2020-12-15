@@ -96,6 +96,8 @@ public class CommandVillage extends BukkitCommand {
 		help.add("&7|&b) &3/village rent &b<&7amount&b>");
 		help.add("&7|&b) &3/village tax &b<&7amount&b>");
 		help.add("&7|&b) &3/village bank &b<&7bal&b,&7deposit&b,&7withdraw&7&b>");
+		help.add("&7|&b) &3/village &bsetmotd");
+		help.add("&7|&b) &3/village &amotd");
 		return help;
 	}
 
@@ -106,7 +108,7 @@ public class CommandVillage extends BukkitCommand {
 		List<String> result = new ArrayList<String>();
 		if (args.length == 1) {
 			arguments.clear();
-			arguments.addAll(Arrays.asList("create", "bank", "leave", "info", "who", "invite", "accept", "deny", "rent", "tax", "pay", "permit", "take", "disband", "addbuff", "rembuff", "buffs", "objectives", "objective", "give", "remove"));
+			arguments.addAll(Arrays.asList("create", "motd", "setmotd", "bank", "leave", "info", "who", "invite", "accept", "deny", "rent", "tax", "pay", "permit", "take", "disband", "addbuff", "rembuff", "buffs", "objectives", "objective", "give", "remove"));
 			for (String b : arguments) {
 				if (b.toLowerCase().startsWith(args[0].toLowerCase()))
 					result.add(b);
@@ -442,6 +444,63 @@ public class CommandVillage extends BukkitCommand {
 					Bukkit.getPluginManager().callEvent(event);
 					if (!event.isCancelled()) {
 						event.perform();
+					}
+				} else {
+					msg.send("&c&oYou are not apart of a village..");
+					return true;
+				}
+				return true;
+			}
+			if (args[0].equalsIgnoreCase("motd")) {
+				// give book
+				Village v = null;
+				for (Village village : ClansVillages.getVillages()) {
+					if (village.isInhabitant(p.getName())) {
+						v = village;
+						break;
+					}
+				}
+				if (v != null) {
+					if (v.getMotdBook() != null) {
+						if (!Arrays.asList(p.getInventory().getContents()).contains(v.getMotdBook())) {
+							p.getInventory().addItem(v.getMotdBook());
+							msg.send("&aMotd book has been given.");
+						} else {
+							msg.send("&c&oYou already have the book.");
+							return true;
+						}
+					} else {
+						msg.send("&c&oYour village doesn't have an motd.");
+						return true;
+					}
+				} else {
+					msg.send("&c&oYou are not apart of a village..");
+					return true;
+				}
+				return true;
+			}
+			if (args[0].equalsIgnoreCase("setmotd")) {
+				Village v = null;
+				for (Village village : ClansVillages.getVillages()) {
+					if (village.isInhabitant(p.getName())) {
+						v = village;
+						break;
+					}
+				}
+				if (v != null) {
+					Inhabitant i = v.getInhabitant(p.getName());
+					if (i.hasPermission(Permission.UPDATE_MOTD)) {
+						if (p.getInventory().getItemInMainHand().getType().equals(Material.WRITTEN_BOOK)) {
+							v.setMotdBook(p.getInventory().getItemInMainHand());
+							v.complete();
+							v.sendMessage("&7&oThe village motd has been updated.");
+						} else {
+							msg.send("&c&oInvalid item. You need a written book.");
+							return true;
+						}
+					} else {
+						// no perm
+						return true;
 					}
 				} else {
 					msg.send("&c&oYou are not apart of a village..");
@@ -810,7 +869,7 @@ public class CommandVillage extends BukkitCommand {
 						p.sendMessage(Clan.clanUtil.color("&7&lObjectives:"));
 						p.sendMessage(Clan.clanUtil.color(" - &7&lCompleted: &f(&a&l" + i.getCompletedObjectives() + "&f)"));
 						if (i.getCurrentObjective() != 0) {
-							p.sendMessage(Clan.clanUtil.color(" - &7&lCurrent: " + v.getObjective(i.getCurrentObjective()).info()));
+							p.sendMessage(Clan.clanUtil.color(" - &7&lCurrent: &f&o" + v.getObjective(i.getCurrentObjective()).info()));
 						} else {
 							p.sendMessage(Clan.clanUtil.color(" - &7&lCurrent: &f(&7None&f)"));
 						}
