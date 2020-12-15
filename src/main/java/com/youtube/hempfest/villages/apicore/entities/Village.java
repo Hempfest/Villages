@@ -75,7 +75,7 @@ public class Village implements Serializable {
 		Objective b = new Objective(2, 150, "Take watch!", "Build an outpost", this);
 		Objective c = new Objective(3, 96, "It's time to talk.", "Build a village hall", this);
 		Objective d = new Objective(4, 432, "Protecting the innocent!", "Build a wall", this);
-		Objective e = new Objective(5, 2, "Quench the thirst.", "Build a well", this);
+		Objective e = new Objective(5, 1, "Quench the thirst.", "Build a well", this);
 		Objective f = new Objective(6, 25, "Destroy the horde!", "Kill 25 zombies with the village trident", this);
 		Objective g = new Objective(7, 1, "Dont hurt me!", "Feed a polar bear salmon", this);
 		Objective h = new Objective(8, 10, "At large we stand.", "Grow your village population to 10 inhabitants", this);
@@ -105,7 +105,7 @@ public class Village implements Serializable {
 
 	public int getLevel() {
 		int level = 0;
-		for (int i = 1; i < 19; i++) {
+		for (int i = 1; i < objectives.size() + 1; i++) {
 			if (instance.getObjective(i).isCompleted()) {
 				level += instance.getObjective(i).getLevel();
 			}

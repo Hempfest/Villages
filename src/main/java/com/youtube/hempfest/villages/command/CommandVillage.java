@@ -307,6 +307,7 @@ public class CommandVillage extends BukkitCommand {
 					Inhabitant i = v.getInhabitant(p.getName());
 					if (i.hasPermission(Permission.UPDATE_HALL)) {
 						v.setHallLoc(p.getLocation());
+						v.complete();
 						v.sendMessage("&3&oVillage hall updated.");
 					} else {
 						// no perms
@@ -331,6 +332,7 @@ public class CommandVillage extends BukkitCommand {
 					Inhabitant i = v.getInhabitant(p.getName());
 					if (i.hasPermission(Permission.UPDATE_OUTPOST)) {
 						v.setOutpostLoc(p.getLocation());
+						v.complete();
 						v.sendMessage("&3&oVillage outpost updated.");
 					} else {
 						// no perms
@@ -358,6 +360,7 @@ public class CommandVillage extends BukkitCommand {
 					}
 					if (v.getOutpost() != null) {
 						Location og = v.getOutpost();
+						msg.send("&aTeleporting in 10 seconds.");
 						Bukkit.getScheduler().scheduleSyncDelayedTask(ClansVillages.getInstance(), () -> p.teleport(og), 10 * 20);
 
 					} else {
@@ -385,6 +388,7 @@ public class CommandVillage extends BukkitCommand {
 					}
 					if (v.getHall() != null) {
 						Location og = v.getHall();
+						msg.send("&aTeleporting in 10 seconds.");
 						Bukkit.getScheduler().scheduleSyncDelayedTask(ClansVillages.getInstance(), () -> p.teleport(og), 10 * 20);
 
 					} else {
@@ -1404,7 +1408,7 @@ public class CommandVillage extends BukkitCommand {
 								if (role.hasPermission(permission)) {
 									role.removePermission(permission);
 									v.complete();
-									msg.send("e6&oTook permission &7" + args[2] + " &e&ofrom role &7" + r.name().toLowerCase());
+									msg.send("&6&oTook permission &7" + args[2] + " &e&ofrom role &7" + r.name().toLowerCase());
 								} else {
 									msg.send("&cThe role doesn't have direct access to this permission!");
 									return true;
