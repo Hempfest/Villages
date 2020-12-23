@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -68,11 +69,11 @@ public class Village implements Serializable {
 		this.uuid = UUID.randomUUID();
 		this.clanID = clanID;
 		this.instance = this;
-		Role ra = new Role(Position.VILLAGE_MEMBER, 1, this);
-		Role rb = new Role(Position.VILLAGE_WARRIOR, 2, this);
-		Role rc = new Role(Position.VILLAGE_PRIEST, 3, this);
-		Role rd = new Role(Position.VILLAGE_WARDEN, 4, this);
-		Role re = new Role(Position.VILLAGE_CHIEF, 5, this);
+		Role ra = new Role(Position.VILLAGE_MEMBER, 100, this);
+		Role rb = new Role(Position.VILLAGE_WARRIOR, 200, this);
+		Role rc = new Role(Position.VILLAGE_PRIEST, 300, this);
+		Role rd = new Role(Position.VILLAGE_WARDEN, 500, this);
+		Role re = new Role(Position.VILLAGE_CHIEF, 1000, this);
 		roles.addAll(Arrays.asList(ra, rb, rc, rd, re));
 		Objective a = new Objective(1, 1, "Awake and alert.", "Install the village alarm", this);
 		Objective b = new Objective(2, 150, "Take watch!", "Build an outpost", this);
@@ -157,7 +158,7 @@ public class Village implements Serializable {
 	}
 
 	public Clan getOwner() {
-		return Clan.clanUtil.getClan(instance.clanID);
+		return CompletableFuture.supplyAsync(() -> Clan.clanUtil.getClan(instance.clanID)).join();
 	}
 
 	public List<Objective> getObjectives() {
@@ -174,7 +175,7 @@ public class Village implements Serializable {
 
 	public int getNextObjective() {
 		int next = 0;
-		for (int i = 1; i < 19; i++) {
+		for (int i = 1; i < objectives.size() + 1; i++) {
 			if (!getObjective(i).isCompleted()) {
 				next = getObjective(i).getLevel();
 				break;
@@ -191,8 +192,9 @@ public class Village implements Serializable {
 	public Role getRole(Position role) {
 		Role result = null;
 		for (Role a : instance.roles) {
-			if (a.getRole().equals(role)) {
+			if (a.getName().equals(role.name())) {
 				result = a;
+				break;
 			}
 		}
 		return result;
@@ -203,13 +205,22 @@ public class Village implements Serializable {
 		for (Role a : instance.roles) {
 			if (a.getPriority() == priority) {
 				result = a;
+				break;
 			}
 		}
 		return result;
 	}
 
+	public List<Role> getRoles() {
+		return instance.roles;
+	}
+
 	public void addRole(Role role) {
 		instance.roles.add(role);
+	}
+
+	public void addObjective(Objective o) {
+		instance.objectives.add(o);
 	}
 
 	/**
@@ -224,7 +235,7 @@ public class Village implements Serializable {
 			}
 		} catch (NullPointerException ignored) {
 		}
-		DataManager dm = new DataManager("Villages", "Configuration");
+		DataManager dm = new DataManager("Villages", "Configuration/Villages");
 		Config v = dm.getFile(ConfigType.MISC_FILE);
 		v.getConfig().set(instance.clanID, instance.id.toString());
 		v.saveConfig();

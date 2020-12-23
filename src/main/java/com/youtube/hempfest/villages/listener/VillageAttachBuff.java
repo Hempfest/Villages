@@ -1,8 +1,8 @@
 package com.youtube.hempfest.villages.listener;
 
-import com.youtube.hempfest.borders.event.BorderTaskEvent;
 import com.youtube.hempfest.clans.util.construct.Claim;
 import com.youtube.hempfest.clans.util.construct.Clan;
+import com.youtube.hempfest.clans.util.events.ClaimResidentEvent;
 import com.youtube.hempfest.villages.ClansVillages;
 import com.youtube.hempfest.villages.apicore.activities.PotionBuff;
 import com.youtube.hempfest.villages.apicore.entities.Village;
@@ -17,9 +17,8 @@ import org.bukkit.event.Listener;
 public class VillageAttachBuff implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH)
-	public void attachBuff(BorderTaskEvent e) {
-		Player p = e.getUser();
-		if (e.isInClaim()) {
+	public void attachBuff(ClaimResidentEvent e) {
+			Player p = e.getResident().getPlayer();
 			Claim c = e.getClaim();
 			// Clan exists
 			Village v = null;
@@ -31,16 +30,25 @@ public class VillageAttachBuff implements Listener {
 			}
 			if (v != null) {
 				Clan clan = v.getOwner();
-					// We own the claim.
-					if (Arrays.asList(clan.getOwnedClaims()).contains(c.getClaimID())) {
-						// Give them the buff.
+				// We own the claim.
+				if (Arrays.asList(clan.getOwnedClaims()).contains(c.getClaimID())) {
+					// Give them the buff.
+					List<PotionBuff> give = v.getBuffs().stream().filter(b -> !p.hasPotionEffect(b.getEffect().getType())).collect(Collectors.toList());
+					for (PotionBuff b : give) {
+						p.addPotionEffect(b.getEffect());
+					}
+				}
+				for (String ally : Clan.clanUtil.getAllies(clan.getClanID())) {
+					Clan a = Clan.clanUtil.getClan(ally);
+					if (Arrays.asList(a.getOwnedClaims()).contains(c.getClaimID())) {
 						List<PotionBuff> give = v.getBuffs().stream().filter(b -> !p.hasPotionEffect(b.getEffect().getType())).collect(Collectors.toList());
 						for (PotionBuff b : give) {
 							p.addPotionEffect(b.getEffect());
 						}
+						break;
 					}
+				}
 			}
-		}
 	}
 
 }

@@ -146,6 +146,7 @@ public class VillageBuilding implements Listener {
 							o.setCompleted(true);
 							i.completed(o.getLevel());
 							i.setObjective(0);
+							v.complete();
 							v.sendMessage("&e&lObjective &f(&b5&f) &f{&3&lCOMPLETE&f}");
 							for (Inhabitant in : v.getInhabitants()) {
 								if (in.getUser().isOnline()) {

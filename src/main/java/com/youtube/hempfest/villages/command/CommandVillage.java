@@ -29,7 +29,9 @@ import com.youtube.hempfest.villages.events.VillageInvitationEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -105,10 +107,10 @@ public class CommandVillage extends BukkitCommand {
 
 	@Override
 	public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
-		List<String> result = new ArrayList<String>();
+		List<String> result = new ArrayList<>();
 		if (args.length == 1) {
 			arguments.clear();
-			arguments.addAll(Arrays.asList("create", "motd", "setmotd", "bank", "leave", "info", "who", "invite", "accept", "deny", "rent", "tax", "pay", "permit", "take", "disband", "addbuff", "rembuff", "buffs", "objectives", "objective", "give", "remove"));
+			arguments.addAll(Arrays.asList("create", "motd", "setoutpost", "sethall", "setmotd", "bank", "outpost", "hall", "leave", "info", "who", "invite", "accept", "deny", "rent", "tax", "pay", "permit", "take", "disband", "addbuff", "rembuff", "buffs", "objectives", "objective", "give", "remove"));
 			for (String b : arguments) {
 				if (b.toLowerCase().startsWith(args[0].toLowerCase()))
 					result.add(b);
@@ -172,6 +174,28 @@ public class CommandVillage extends BukkitCommand {
 				}
 				for (Player p : Bukkit.getOnlinePlayers()) {
 					arguments.add(p.getName());
+				}
+				for (String b : arguments) {
+					if (b.toLowerCase().startsWith(args[1].toLowerCase()))
+						result.add(b);
+				}
+				return result;
+			}
+			if (args[0].equalsIgnoreCase("give")) {
+				arguments.clear();
+				for (Inhabitant i : ClansVillages.getVillageInhabitants((Player)sender)) {
+					arguments.add(i.getUser().getName());
+				}
+				for (String b : arguments) {
+					if (b.toLowerCase().startsWith(args[1].toLowerCase()))
+						result.add(b);
+				}
+				return result;
+			}
+			if (args[0].equalsIgnoreCase("remove")) {
+				arguments.clear();
+				for (Inhabitant i : ClansVillages.getVillageInhabitants((Player)sender)) {
+					arguments.add(i.getUser().getName());
 				}
 				for (String b : arguments) {
 					if (b.toLowerCase().startsWith(args[1].toLowerCase()))
@@ -361,6 +385,10 @@ public class CommandVillage extends BukkitCommand {
 						return true;
 					}
 					if (v.getOutpost() != null) {
+						if (!v.getObjective(2).isCompleted()) {
+							msg.send("&c&oYour village hasn't yet completed quest level 2. Too low level.");
+							return true;
+						}
 						Location og = v.getOutpost();
 						msg.send("&aTeleporting in 10 seconds.");
 						Bukkit.getScheduler().scheduleSyncDelayedTask(ClansVillages.getInstance(), () -> p.teleport(og), 10 * 20);
@@ -389,12 +417,44 @@ public class CommandVillage extends BukkitCommand {
 						return true;
 					}
 					if (v.getHall() != null) {
+						if (!v.getObjective(3).isCompleted()) {
+							msg.send("&c&oYour village hasn't yet completed quest level 3. Too low level.");
+							return true;
+						}
 						Location og = v.getHall();
 						msg.send("&aTeleporting in 10 seconds.");
 						Bukkit.getScheduler().scheduleSyncDelayedTask(ClansVillages.getInstance(), () -> p.teleport(og), 10 * 20);
 
 					} else {
 						msg.send("&cYour village doesn't currently have a hall.");
+						return true;
+					}
+				} else {
+					msg.send("&c&oYou are not apart of a village..");
+					return true;
+				}
+				return true;
+			}
+			if (args[0].equalsIgnoreCase("alarm")) {
+				Village v = null;
+				for (Village village : ClansVillages.getVillages()) {
+					if (village.isInhabitant(p.getName())) {
+						v = village;
+						break;
+					}
+				}
+				if (v != null) {
+					if (!v.getInhabitant(p.getName()).hasPermission(Permission.TELEPORT_ALARM)) {
+						msg.send("&c&oYou are not permitted to teleport to the villages alarm. Ask the chief for permission.");
+						return true;
+					}
+					if (v.getHall() != null) {
+						Location og = v.getAlarm().add(1, 0, 1);
+						msg.send("&aTeleporting in 10 seconds.");
+						Bukkit.getScheduler().scheduleSyncDelayedTask(ClansVillages.getInstance(), () -> p.teleport(og), 10 * 20);
+
+					} else {
+						msg.send("&cYour village doesn't currently have an alarm.");
 						return true;
 					}
 				} else {
@@ -415,17 +475,8 @@ public class CommandVillage extends BukkitCommand {
 					msg.send("&c&oYou are already a member of a village.");
 					return true;
 				}
-
-				Clan c = HempfestClans.clanManager(p);
-				// make way to check if bell already given. Then charge for another if so.
-				ItemStack bell = makePersistentItem(Material.BELL, "&6&lVILLAGE ALARM", "clan-id", c.getClanID(), "");
-				if (!Arrays.asList(p.getInventory().getContents()).contains(bell)) {
-					p.getInventory().addItem(bell);
-					msg.send("&aPlace down the alarm to begin leveling your village.");
-				} else {
-					msg.send("&c&oYou already have an alarm, place it down to begin leveling your village.");
-					return true;
-				}
+				msg.send("&3&oYou need to craft a village alarm and place it down to announce your village.");
+				return true;
 			}
 			if (args[0].equalsIgnoreCase("disband")) {
 				Village v = null;
@@ -527,6 +578,39 @@ public class CommandVillage extends BukkitCommand {
 				}
 				return true;
 			}
+			if (args[0].equalsIgnoreCase("members")) {
+				Village v = null;
+				for (Village village : ClansVillages.getVillages()) {
+					if (village.isInhabitant(p.getName())) {
+						v = village;
+						break;
+					}
+				}
+				if (v != null) {
+					//Map<String, Long> peoples = new HashMap<>();
+					List<String> members = new ArrayList<>();
+					for (Inhabitant i : v.getInhabitants()) {
+						//peoples.put(i.getUser().getName(), (long) i.getCompletedObjectives());
+						members.add(i.getUser().getName());
+					}
+					PaginatedAssortment assortment = new PaginatedAssortment(p, members);
+					assortment.setListTitle("&7&m------------&7&l[&3Village Members&7&l]&7&m------------");
+					assortment.setListBorder("&7&m▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+					assortment.setLinesPerPage(5);
+					assortment.setNavigateCommand("v members");
+					//assortment.setCommandToRun("v who %s");
+					//assortment.setNormalText("");
+					//assortment.setHoverText(" &#787674# &#0eaccc&l" + "%s" + " &#00fffb&o" + "%s" + " &#787674: &#ff7700&l" + "%s");
+					//assortment.setHoverTextMessage("&6Click to view information for &e%s");
+					//assortment.exportSorted(PaginatedAssortment.MapType.LONG, Integer.parseInt(args[1]));
+					assortment.export(1);
+				} else {
+					msg.send("&c&oYou are not apart of a village..");
+					return true;
+				}
+
+				return true;
+			}
 			if (args[0].equalsIgnoreCase("info")) {
 				Village v = null;
 				for (Village village : ClansVillages.getVillages()) {
@@ -554,13 +638,19 @@ public class CommandVillage extends BukkitCommand {
 					} else {
 						outpostSet = true;
 					}
-					msg.send(Clan.clanUtil.getColor(v.getOwner().getChatColor()) + v.getOwner().getClanTag() + " &f| &3&oVillage information");
+					msg.send("&3&oVillage information");
 					msg = new Message(p, null);
 					msg.send("&f&l&m▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+					msg.send("&3&lDictator: " + Clan.clanUtil.getColor(v.getOwner().getChatColor()) + v.getOwner().getClanTag());
+					msg.send("&f&l&m▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
 					if (alarmSet) {
-						msg.send("&3Alarm: " + "&ainstalled");
+						if (Bukkit.getVersion().contains("1.16")) {
+							msg.build(new Text().textRunnable("&3&nAlarm: ", "&f(&b&lCLICK&f)", "Click to teleport.", "v alarm"));
+						} else {
+							msg.build(Text_R2.textRunnable("&3&nAlarm: ", "&f(&b&lCLICK&f)", "Click to teleport.", "v alarm"));
+						}
 					} else {
-						msg.send("&3Alarm: " + "&c&omissing");
+						msg.send("&3&o&nAlarm: " + "&c&omissing");
 					}
 					if (hallSet) {
 						if (Bukkit.getVersion().contains("1.16")) {
@@ -591,14 +681,24 @@ public class CommandVillage extends BukkitCommand {
 					}
 					msg.send("&3Owned Land: &f(&b" + chunks + "&f) chunk(s)");
 					msg.send("&f&l&m▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-					if (v.getDailyPayment() > 0) {
-						msg.send("&3&lRent: &6&n" + v.getDailyPayment());
-						msg.send("&b&oLate Tax: &c&o" + v.getLateTax());
-						msg.send("&f&l&m▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-					}
+					msg.send("&3&lRent: &6&n" + v.getDailyPayment());
+					msg.send("&b&oLate Tax: &c&o" + v.getLateTax());
+					msg.send("&f&l&m▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
 					msg.send("&3Bank: &6&o" + v.getVillageBankBalance());
 					msg.send("&f&l&m▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
-					msg.send("&7&odictated by &3&l&o" + v.getOwner().getClanTag());
+					msg.send("&3&nRoles:");
+					for (Role r : v.getRoles()) {
+						msg.send(" &e&l( &7" + r.getName() + " &f:&r " + r.getPermissions().toString() + " &e&l) ");
+					}
+					msg.send("&f&l&m▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+					if (v.getBuffs().size() > 0) {
+						StringBuilder text = new StringBuilder();
+						msg.send("&aActive territory buffs:");
+						for (PotionBuff buff : v.getBuffs()) {
+							text.append(" &f&o- &b").append(buff.getBuff().name());
+						}
+						msg.send(text.toString());
+					}
 				} else {
 					msg.send("&c&oYou are not apart of a village..");
 					return true;
@@ -607,6 +707,19 @@ public class CommandVillage extends BukkitCommand {
 			}
 			if (args[0].equalsIgnoreCase("bank")) {
 				// not enough args {balance, deposit, withdraw}
+				Village v = null;
+				for (Village village : ClansVillages.getVillages()) {
+					if (village.isInhabitant(p.getName())) {
+						v = village;
+						break;
+					}
+				}
+				if (v != null) {
+					msg.send("&c&oInvalid usage: &7/v bank &6balance&f,&6deposit&f,&6withdraw");
+				} else {
+					msg.send("&c&oYou are not apart of a village..");
+					return true;
+				}
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("pay")) {
@@ -678,10 +791,6 @@ public class CommandVillage extends BukkitCommand {
 				msg.send("&c&oInvalid usage: &7/village permit &f<&6playerName&f,&6roleName&f> <&6&oaction&f>");
 				return true;
 			}
-			if (args[0].equalsIgnoreCase("bank")) {
-				msg.send("&c&oInvalid usage: &7/village bank &f<&6bal&f,&6deposit&f,&6withdraw&f> <&6&oamount?&f>");
-				return true;
-			}
 			try {
 				int page = Integer.parseInt(args[0]);
 				PaginatedAssortment assortment = new PaginatedAssortment(p, helpMenu());
@@ -699,6 +808,45 @@ public class CommandVillage extends BukkitCommand {
 		}
 
 		if (length == 2) {
+			if (args[0].equalsIgnoreCase("members")) {
+				Village v = null;
+				for (Village village : ClansVillages.getVillages()) {
+					if (village.isInhabitant(p.getName())) {
+						v = village;
+						break;
+					}
+				}
+				if (v != null) {
+					try {
+						Integer.parseInt(args[1]);
+					} catch (NumberFormatException e) {
+						msg.send("&c&oInvalid page number / sub-command");
+						return true;
+					}
+					//Map<String, Long> peoples = new HashMap<>();
+					List<String> members = new ArrayList<>();
+					for (Inhabitant i : v.getInhabitants()) {
+						//peoples.put(i.getUser().getName(), (long) i.getCompletedObjectives());
+						members.add(i.getUser().getName());
+					}
+					PaginatedAssortment assortment = new PaginatedAssortment(p, members);
+					assortment.setListTitle("&7&m------------&7&l[&3Village Members&7&l]&7&m------------");
+					assortment.setListBorder("&7&m▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
+					assortment.setLinesPerPage(5);
+					assortment.setNavigateCommand("v members");
+					//assortment.setCommandToRun("v who %s");
+					//assortment.setNormalText("");
+					//assortment.setHoverText(" &#787674# &#0eaccc&l" + "%s" + " &#00fffb&o" + "%s" + " &#787674: &#ff7700&l" + "%s");
+					//assortment.setHoverTextMessage("&6Click to view information for &e%s");
+					//assortment.exportSorted(PaginatedAssortment.MapType.LONG, Integer.parseInt(args[1]));
+					assortment.export(Integer.parseInt(args[1]));
+				} else {
+					msg.send("&c&oYou are not apart of a village..");
+					return true;
+				}
+
+				return true;
+			}
 			if (args[0].equalsIgnoreCase("bank")) {
 				Village v = null;
 				for (Village village : ClansVillages.getVillages()) {
@@ -962,7 +1110,9 @@ public class CommandVillage extends BukkitCommand {
 					}
 				} else {
 					msg.send("&c&oThe village you're trying to enter doesn't exist.");
+					return true;
 				}
+				return true;
 			}
 
 			if (args[0].equalsIgnoreCase("deny")) {
@@ -996,7 +1146,9 @@ public class CommandVillage extends BukkitCommand {
 					}
 				} else {
 					msg.send("&c&oThe village you're trying to deny doesn't exist.");
+					return true;
 				}
+				return true;
 			}
 			if (args[0].equalsIgnoreCase("addbuff")) {
 				Village v = null;
@@ -1023,7 +1175,7 @@ public class CommandVillage extends BukkitCommand {
 									msg.send("&cYour village has reached the max amount of buffs!");
 									return true;
 								}
-								new PotionBuff(b.getEffect(), v);
+								new PotionBuff(b, b.getEffect(), v);
 								v.complete();
 								v.sendMessage("&a&l" + p.getName() + " &3added a new buff to owned land.");
 							} else {

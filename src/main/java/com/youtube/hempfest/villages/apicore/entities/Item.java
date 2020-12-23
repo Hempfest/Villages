@@ -13,6 +13,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 public class Item {
@@ -116,6 +117,14 @@ public class Item {
 		meta.setDisplayName(Clan.clanUtil.color("&f&lTEAR OF GOD"));
 		item.setItemMeta(meta);
 		item.addUnsafeEnchantment(Enchantment.VANISHING_CURSE, 1);
+		return item;
+	}
+
+	public static ItemStack alarmItem2() {
+		ItemStack item = new ItemStack(Material.ENCHANTED_BOOK);
+		EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+		meta.addStoredEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2, false);
+		item.setItemMeta(meta);
 		return item;
 	}
 

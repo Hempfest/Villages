@@ -25,7 +25,7 @@ public class AlarmProtect implements Listener {
 				}
 				if (v != null) {
 					if (v.getAlarm() != null) {
-						if (v.getAlarm().distance(p.getLocation()) <= 10) {
+						if (v.getAlarm().distance(p.getLocation()) <= 40) {
 							e.setCancelled(true);
 						}
 					}

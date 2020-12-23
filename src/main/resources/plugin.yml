@@ -3,6 +3,6 @@ version: 1.0.0
 main: com.youtube.hempfest.villages.ClansVillages
 api-version: 1.16
 prefix: Clans
-depend: [ Clans, HempCore, Borders ]
+depend: [ Clans, HempCore ]
 authors: [ Hempfest ]
 description: An addon for Clans [Free] that implements villages for clans.

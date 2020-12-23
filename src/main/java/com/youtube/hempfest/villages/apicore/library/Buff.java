@@ -4,6 +4,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public enum Buff {
+
 	FAST_DIG(new PotionEffect(PotionEffectType.FAST_DIGGING, 20 * 60, 2)),
 	HIGH_JUMP(new PotionEffect(PotionEffectType.JUMP, 20 * 60, 2)),
 	MORE_LUCK(new PotionEffect(PotionEffectType.LUCK, 20 * 60, 1)),
@@ -20,4 +21,7 @@ public enum Buff {
 	public PotionEffect getEffect() {
 		return effect;
 	}
+
+
+
 }

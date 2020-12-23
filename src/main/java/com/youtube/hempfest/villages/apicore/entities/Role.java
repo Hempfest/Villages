@@ -53,8 +53,8 @@ public class Role extends Inheritance implements Serializable {
 		return village;
 	}
 
-	public Position getRole() {
-		return role;
+	public String getName() {
+		return role.name();
 	}
 
 	public int getPriority() {

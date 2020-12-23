@@ -10,6 +10,7 @@ import com.youtube.hempfest.hempcore.command.CommandBuilder;
 import com.youtube.hempfest.hempcore.event.EventBuilder;
 import com.youtube.hempfest.hempcore.library.HFEncoded;
 import com.youtube.hempfest.hempcore.library.HUID;
+import com.youtube.hempfest.villages.apicore.entities.Inhabitant;
 import com.youtube.hempfest.villages.apicore.entities.Item;
 import com.youtube.hempfest.villages.apicore.entities.Village;
 import java.io.File;
@@ -21,6 +22,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -96,11 +98,11 @@ public final class ClansVillages extends JavaPlugin {
 		alarm.setKey("village_alarm");
 		alarm.makeItem();
 		alarm.addEnchant(Enchantment.VANISHING_CURSE, 1);
-		alarm.setItem('D', Material.DIAMOND);
-		alarm.setItem('B', Material.BELL);
-		alarm.setItem('O', Material.AIR);
-		alarm.setItem('E', Material.ENCHANTED_BOOK);
-		alarm.setItem('T', Material.REDSTONE_TORCH);
+		alarm.setItem('D', new ItemStack(Material.DIAMOND));
+		alarm.setItem('B', new ItemStack(Material.BELL));
+		alarm.setItem('O', new ItemStack(Material.AIR));
+		alarm.setItem('E', Item.alarmItem2());
+		alarm.setItem('T', new ItemStack(Material.REDSTONE_TORCH));
 		alarm.recipeShape("DDD", "TBT", "OEO");
 		alarm.register();
 		/** ------------ \/ TEAR OF GOD \/--------------*/
@@ -257,6 +259,20 @@ public final class ClansVillages extends JavaPlugin {
 
 	public static ClansVillages getInstance() {
 		return instance;
+	}
+
+	public static List<Inhabitant> getVillageInhabitants(Player p) {
+		Village v = null;
+		List<Inhabitant> query = null;
+		for (Village village : villages) {
+			if (village.isInhabitant(p)) {
+				v = village;
+			}
+		}
+		if (v!=null) {
+			query = v.getInhabitants();
+		}
+		return query;
 	}
 
 	public List<Location> getAllAlarms() {

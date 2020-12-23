@@ -1,6 +1,7 @@
 package com.youtube.hempfest.villages.apicore.activities;
 
 import com.youtube.hempfest.villages.apicore.entities.Village;
+import com.youtube.hempfest.villages.apicore.library.Buff;
 import java.io.Serializable;
 import org.bukkit.potion.PotionEffect;
 
@@ -10,9 +11,12 @@ public class PotionBuff implements Serializable {
 
 	private final Village village;
 
-	public PotionBuff(PotionEffect effect, Village village) {
+	private final Buff buff;
+
+	public PotionBuff(Buff buff, PotionEffect effect, Village village) {
 		this.village = village;
 		this.effect = effect;
+		this.buff = buff;
 		add();
 	}
 
@@ -29,6 +33,8 @@ public class PotionBuff implements Serializable {
 			village.addBuff(this);
 		}
 	}
+
+	public Buff getBuff() { return buff; }
 
 	public PotionEffect getEffect() {
 		return effect;
