@@ -1,14 +1,14 @@
 package com.youtube.hempfest.villages.command;
 
+import com.github.sanctum.labyrinth.Labyrinth;
+import com.github.sanctum.labyrinth.formatting.component.Text_R2;
+import com.github.sanctum.labyrinth.formatting.string.ColoredString;
+import com.github.sanctum.labyrinth.formatting.string.PaginatedAssortment;
+import com.github.sanctum.labyrinth.gui.GuiLibrary;
+import com.github.sanctum.labyrinth.library.Message;
+import com.github.sanctum.labyrinth.library.TextLib;
 import com.youtube.hempfest.clans.HempfestClans;
 import com.youtube.hempfest.clans.util.construct.Clan;
-import com.youtube.hempfest.hempcore.HempCore;
-import com.youtube.hempfest.hempcore.formatting.component.Text;
-import com.youtube.hempfest.hempcore.formatting.component.Text_R2;
-import com.youtube.hempfest.hempcore.formatting.string.ColoredString;
-import com.youtube.hempfest.hempcore.formatting.string.PaginatedAssortment;
-import com.youtube.hempfest.hempcore.gui.GuiLibrary;
-import com.youtube.hempfest.hempcore.library.Message;
 import com.youtube.hempfest.villages.ClansVillages;
 import com.youtube.hempfest.villages.apicore.activities.Objective;
 import com.youtube.hempfest.villages.apicore.activities.PotionBuff;
@@ -448,7 +448,7 @@ public class CommandVillage extends BukkitCommand {
 						msg.send("&c&oYou are not permitted to teleport to the villages alarm. Ask the chief for permission.");
 						return true;
 					}
-					if (v.getHall() != null) {
+					if (v.getAlarm() != null) {
 						Location og = v.getAlarm().add(1, 0, 1);
 						msg.send("&aTeleporting in 10 seconds.");
 						Bukkit.getScheduler().scheduleSyncDelayedTask(ClansVillages.getInstance(), () -> p.teleport(og), 10 * 20);
@@ -569,7 +569,7 @@ public class CommandVillage extends BukkitCommand {
 				}
 
 				if (v != null) {
-					GuiLibrary lib = HempCore.guiManager(p);
+					GuiLibrary lib = Labyrinth.guiManager(p);
 					lib.setData(v.getId().toString());
 					new InventoryObjectives(lib).open();
 				} else {
@@ -644,29 +644,17 @@ public class CommandVillage extends BukkitCommand {
 					msg.send("&3&lDictator: " + Clan.clanUtil.getColor(v.getOwner().getChatColor()) + v.getOwner().getClanTag());
 					msg.send("&f&l&m▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬");
 					if (alarmSet) {
-						if (Bukkit.getVersion().contains("1.16")) {
-							msg.build(new Text().textRunnable("&3&nAlarm: ", "&f(&b&lCLICK&f)", "Click to teleport.", "v alarm"));
-						} else {
-							msg.build(Text_R2.textRunnable("&3&nAlarm: ", "&f(&b&lCLICK&f)", "Click to teleport.", "v alarm"));
-						}
+						msg.build(TextLib.getInstance().textRunnable("&3&nAlarm: ", "&f(&b&lCLICK&f)", "Click to teleport.", "v alarm"));
 					} else {
 						msg.send("&3&o&nAlarm: " + "&c&omissing");
 					}
 					if (hallSet) {
-						if (Bukkit.getVersion().contains("1.16")) {
-							msg.build(new Text().textRunnable("&3Hall: ", "&f(&b&lCLICK&f)", "Click to teleport.", "v hall"));
-						} else {
-							msg.build(Text_R2.textRunnable("&3Hall: ", "&f(&b&lCLICK&f)", "Click to teleport.", "v hall"));
-						}
+						msg.build(TextLib.getInstance().textRunnable("&3Hall: ", "&f(&b&lCLICK&f)", "Click to teleport.", "v hall"));
 					} else {
 						msg.send("&3Hall: " + "&c&oNot set");
 					}
 					if (outpostSet) {
-						if (Bukkit.getVersion().contains("1.16")) {
-							msg.build(new Text().textRunnable("&3Outpost: ", "&f(&b&lCLICK&f)", "Click to teleport.", "v outpost"));
-						} else {
-							msg.build(Text_R2.textRunnable("&3Outpost: ", "&f(&b&lCLICK&f)", "Click to teleport.", "v outpost"));
-						}
+						msg.build(TextLib.getInstance().textRunnable("&3Outpost: ", "&f(&b&lCLICK&f)", "Click to teleport.", "v outpost"));
 					} else {
 						msg.send("&3Outpost: " + "&c&oNot set");
 					}

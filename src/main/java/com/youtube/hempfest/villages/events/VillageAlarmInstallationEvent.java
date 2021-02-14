@@ -3,9 +3,12 @@ package com.youtube.hempfest.villages.events;
 import com.youtube.hempfest.clans.util.StringLibrary;
 import com.youtube.hempfest.clans.util.construct.Clan;
 import com.youtube.hempfest.clans.util.construct.ClanUtil;
+import com.youtube.hempfest.clans.util.data.Config;
 import com.youtube.hempfest.clans.util.listener.ClanEventBuilder;
+import com.youtube.hempfest.villages.ClansVillages;
 import com.youtube.hempfest.villages.apicore.entities.Inhabitant;
 import com.youtube.hempfest.villages.apicore.entities.Village;
+import java.io.InputStream;
 import org.bukkit.Location;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -81,13 +84,31 @@ public class VillageAlarmInstallationEvent extends ClanEventBuilder implements C
 
 	public void perform() {
 		if (village.getAlarm() != null) {
-			inhabitant.getUser().getPlayer().sendMessage(stringLibrary().color("&c&oYour village already has an alarm system."));
+			stringLibrary().sendMessage(inhabitant.getUser().getPlayer(), getDeny());
 			allowInstall(false);
 			return;
 		}
 		village.setAlarmLoc(alarmLoc);
 		village.complete();
-		village.sendMessage(inhabitant.getUser().getName() + " &a&ohas re-installed the village alarm.");
+		village.sendMessage(String.format(getMessage(), inhabitant.getUser().getName()));
+	}
+
+	public String getDeny() {
+		Config data = Config.get("Messages", "Configuration/Villages");
+		if (!data.exists()) {
+			InputStream is = ClansVillages.getInstance().getResource("Messages.yml");
+			Config.copy(is, data.getFile());
+		}
+		return data.getConfig().getString("alarm-deny");
+	}
+
+	public String getMessage() {
+		Config data = Config.get("Messages", "Configuration/Villages");
+		if (!data.exists()) {
+			InputStream is = ClansVillages.getInstance().getResource("Messages.yml");
+			Config.copy(is, data.getFile());
+		}
+		return data.getConfig().getString("alarm-install");
 	}
 
 }

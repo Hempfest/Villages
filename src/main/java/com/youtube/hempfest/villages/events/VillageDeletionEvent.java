@@ -3,13 +3,13 @@ package com.youtube.hempfest.villages.events;
 import com.youtube.hempfest.clans.util.StringLibrary;
 import com.youtube.hempfest.clans.util.construct.Clan;
 import com.youtube.hempfest.clans.util.construct.ClanUtil;
+import com.youtube.hempfest.clans.util.data.Config;
 import com.youtube.hempfest.clans.util.listener.ClanEventBuilder;
 import com.youtube.hempfest.villages.ClansVillages;
-import com.youtube.hempfest.villages.apicore.activities.Objective;
 import com.youtube.hempfest.villages.apicore.entities.Inhabitant;
 import com.youtube.hempfest.villages.apicore.entities.Village;
-import com.youtube.hempfest.villages.apicore.library.Permission;
 import com.youtube.hempfest.villages.apicore.library.Position;
+import java.io.InputStream;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -69,9 +69,18 @@ public class VillageDeletionEvent extends ClanEventBuilder implements Cancellabl
 
 	public void perform() {
 		if (village.getInhabitant(deleter.getName()).hasRole(Position.VILLAGE_CHIEF)) {
-			Bukkit.broadcastMessage(stringLibrary().color(stringLibrary().getPrefix() +  " &c&lA VILLAGE HAS PLUNDERED! &7Dictator: &b&l" + village.getOwner().getClanTag()));
+			Bukkit.broadcastMessage(stringLibrary().color(String.format(getBroadcast(), village.getOwner().getClanTag())));
 			ClansVillages.deleteVillageByMetaId(village.getOwner().getId(425));
 		}
+	}
+
+	public String getBroadcast() {
+		Config data = Config.get("Messages", "Villages");
+		if (!data.exists()) {
+			InputStream is = ClansVillages.getInstance().getResource("Messages.yml");
+			Config.copy(is, data.getFile());
+		}
+		return data.getConfig().getString("village-delete");
 	}
 
 }

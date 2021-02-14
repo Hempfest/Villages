@@ -4,6 +4,7 @@ import com.youtube.hempfest.clans.HempfestClans;
 import com.youtube.hempfest.clans.util.StringLibrary;
 import com.youtube.hempfest.clans.util.construct.Clan;
 import com.youtube.hempfest.clans.util.construct.ClanUtil;
+import com.youtube.hempfest.clans.util.data.Config;
 import com.youtube.hempfest.clans.util.listener.ClanEventBuilder;
 import com.youtube.hempfest.villages.ClansVillages;
 import com.youtube.hempfest.villages.apicore.activities.Objective;
@@ -11,6 +12,7 @@ import com.youtube.hempfest.villages.apicore.entities.Inhabitant;
 import com.youtube.hempfest.villages.apicore.library.Permission;
 import com.youtube.hempfest.villages.apicore.library.Position;
 import com.youtube.hempfest.villages.apicore.entities.Village;
+import java.io.InputStream;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -88,7 +90,16 @@ public class VillageCreationEvent extends ClanEventBuilder implements Cancellabl
 			o.setCompleted(true);
 		}
 		village.complete();
-		Bukkit.broadcastMessage(Clan.clanUtil.color(Clan.clanUtil.getPrefix() + " &a&lA NEW VILLAGE APPEARS! &7Dictator: " + Clan.clanUtil.getColor(village.getOwner().getChatColor()) + village.getOwner().getClanTag()));
+		Bukkit.broadcastMessage(Clan.clanUtil.color(String.format(getBroadcast(), creator.getName(), Clan.clanUtil.getColor(village.getOwner().getChatColor()) + village.getOwner().getClanTag())));
+	}
+
+	public String getBroadcast() {
+		Config data = Config.get("Messages", "Villages");
+		if (!data.exists()) {
+			InputStream is = ClansVillages.getInstance().getResource("Messages.yml");
+			Config.copy(is, data.getFile());
+		}
+		return data.getConfig().getString("village-create");
 	}
 
 }

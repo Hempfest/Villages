@@ -1,24 +1,165 @@
 package com.youtube.hempfest.villages.listener;
 
+import com.google.common.collect.MapMaker;
 import com.youtube.hempfest.clans.HempfestClans;
 import com.youtube.hempfest.clans.util.construct.Clan;
+import com.youtube.hempfest.clans.util.data.Config;
+import com.youtube.hempfest.clans.util.events.ClaimResidentEvent;
 import com.youtube.hempfest.clans.util.events.CustomChatEvent;
 import com.youtube.hempfest.clans.util.events.RaidShieldEvent;
 import com.youtube.hempfest.clans.util.events.SubCommandEvent;
 import com.youtube.hempfest.clans.util.events.TabInsertEvent;
+import com.youtube.hempfest.clans.util.events.WildernessInhabitantEvent;
 import com.youtube.hempfest.villages.ClansVillages;
 import com.youtube.hempfest.villages.apicore.entities.Inhabitant;
 import com.youtube.hempfest.villages.apicore.entities.Village;
 import com.youtube.hempfest.villages.apicore.library.Permission;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentMap;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 public class VillageClans implements Listener {
+
+	private final ConcurrentMap<Player, Boolean> titleSent = new MapMaker().
+			weakKeys().
+			weakValues().
+			makeMap();
+
+	public String getEnterTitle() {
+		Config data = Config.get("Messages", "Configuration/Villages");
+		if (!data.exists()) {
+			InputStream is = ClansVillages.getInstance().getResource("Messages.yml");
+			Config.copy(is, data.getFile());
+		}
+		return data.getConfig().getString("village-near.title-enter");
+	}
+
+	public String getEnterSub() {
+		Config data = Config.get("Messages", "Configuration/Villages");
+		if (!data.exists()) {
+			InputStream is = ClansVillages.getInstance().getResource("Messages.yml");
+			Config.copy(is, data.getFile());
+		}
+		return data.getConfig().getString("village-near.sub-enter");
+	}
+
+	public String getExitTitle() {
+		Config data = Config.get("Messages", "Configuration/Villages");
+		if (!data.exists()) {
+			InputStream is = ClansVillages.getInstance().getResource("Messages.yml");
+			Config.copy(is, data.getFile());
+		}
+		return data.getConfig().getString("village-near.title-exit");
+	}
+
+	public String getExitSub() {
+		Config data = Config.get("Messages", "Configuration/Villages");
+		if (!data.exists()) {
+			InputStream is = ClansVillages.getInstance().getResource("Messages.yml");
+			Config.copy(is, data.getFile());
+		}
+		return data.getConfig().getString("village-near.sub-exit");
+	}
+
+	public boolean sendTitle() {
+		Config data = Config.get("Messages", "Configuration/Villages");
+		if (!data.exists()) {
+			InputStream is = ClansVillages.getInstance().getResource("Messages.yml");
+			Config.copy(is, data.getFile());
+		}
+		return data.getConfig().getBoolean("village-near.send-title");
+	}
+
+	public String getEnterMessage() {
+		Config data = Config.get("Messages", "Configuration/Villages");
+		if (!data.exists()) {
+			InputStream is = ClansVillages.getInstance().getResource("Messages.yml");
+			Config.copy(is, data.getFile());
+		}
+		return data.getConfig().getString("village-near.message-enter");
+	}
+
+	public String getExitMessage() {
+		Config data = Config.get("Messages", "Configuration/Villages");
+		if (!data.exists()) {
+			InputStream is = ClansVillages.getInstance().getResource("Messages.yml");
+			Config.copy(is, data.getFile());
+		}
+		return data.getConfig().getString("village-near.message-exit");
+	}
+
+	@EventHandler
+	public void onResident(ClaimResidentEvent e) throws Exception {
+		Player p = e.getResident().getPlayer();
+		if (ClansVillages.getInstance().getAllAlarms().size() == 0) {
+			return;
+		}
+		for (Location a : ClansVillages.getInstance().getAllAlarms()) {
+			if (a.distance(p.getLocation()) <= 100) {
+				Callable<Village> village = () -> ClansVillages.getVillageByAlarm(a);
+				Village v = village.call();
+				if (!titleSent.containsKey(p) || !titleSent.get(p)) {
+					titleSent.put(p, true);
+					e.stringLibrary().sendMessage(p, String.format(getEnterMessage(), v.getOwner().getClanTag()));
+					if (sendTitle()) {
+						p.sendTitle(e.stringLibrary().color(String.format(getEnterTitle(), v.getOwner().getClanTag())), e.stringLibrary().color(String.format(getEnterSub(), v.getOwner().getClanTag())), 10, 25, 10);
+					}
+					break;
+				}
+			}
+			if (a.distance(p.getLocation()) >= 100) {
+				if (titleSent.containsKey(p) && titleSent.get(p)) {
+					titleSent.put(p, false);
+					e.stringLibrary().sendMessage(p, getExitMessage());
+					if (sendTitle()) {
+						p.sendTitle(e.stringLibrary().color(getExitTitle()), e.stringLibrary().color(getExitSub()), 10, 25, 10);
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	@EventHandler
+	public void onWild(WildernessInhabitantEvent e) throws Exception {
+		Player p = e.getPlayer();
+		if (ClansVillages.getInstance().getAllAlarms().size() == 0) {
+			return;
+		}
+		for (Location a : ClansVillages.getInstance().getAllAlarms()) {
+			if (a.distance(p.getLocation()) <= 100) {
+				Callable<Village> village = () -> ClansVillages.getVillageByAlarm(a);
+				Village v = village.call();
+				if (!titleSent.containsKey(p) || !titleSent.get(p)) {
+					titleSent.put(p, true);
+					e.stringLibrary().sendMessage(p, String.format(getEnterMessage(), v.getOwner().getClanTag()));
+					if (sendTitle()) {
+						p.sendTitle(e.stringLibrary().color(String.format(getEnterTitle(), v.getOwner().getClanTag())), e.stringLibrary().color(String.format(getEnterSub(), v.getOwner().getClanTag())), 10, 25, 10);
+					}
+					break;
+				}
+			}
+			if (a.distance(p.getLocation()) >= 100) {
+				if (titleSent.containsKey(p) && titleSent.get(p)) {
+					titleSent.put(p, false);
+					e.stringLibrary().sendMessage(p, getExitMessage());
+					if (sendTitle()) {
+						p.sendTitle(e.stringLibrary().color(getExitTitle()), e.stringLibrary().color(getExitSub()), 10, 25, 10);
+					}
+					break;
+				}
+			}
+		}
+	}
 
 	@EventHandler
 	public void onShield(RaidShieldEvent e) {

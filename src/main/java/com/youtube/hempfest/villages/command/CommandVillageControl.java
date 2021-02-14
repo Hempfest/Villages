@@ -1,19 +1,14 @@
 package com.youtube.hempfest.villages.command;
 
+import com.github.sanctum.labyrinth.formatting.string.PaginatedAssortment;
+import com.github.sanctum.labyrinth.library.Message;
 import com.youtube.hempfest.clans.util.construct.Clan;
-import com.youtube.hempfest.hempcore.formatting.string.PaginatedAssortment;
-import com.youtube.hempfest.hempcore.library.Message;
 import com.youtube.hempfest.villages.ClansVillages;
 import com.youtube.hempfest.villages.apicore.entities.Village;
-import com.youtube.hempfest.villages.apicore.library.Position;
-import com.youtube.hempfest.villages.apicore.permissive.BuffFinder;
-import com.youtube.hempfest.villages.apicore.permissive.PermFinder;
-import com.youtube.hempfest.villages.apicore.permissive.RoleFinder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;

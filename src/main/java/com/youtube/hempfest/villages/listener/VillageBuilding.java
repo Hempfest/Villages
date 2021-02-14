@@ -27,7 +27,7 @@ import org.bukkit.event.block.SignChangeEvent;
 
 public class VillageBuilding implements Listener {
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.NORMAL)
 	public void villageBuilding(BlockPlaceEvent e) {
 		Player p = e.getPlayer();
 		if (!e.isCancelled()) {

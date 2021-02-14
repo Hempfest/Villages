@@ -1,5 +1,6 @@
 package com.youtube.hempfest.villages.apicore.entities;
 
+import com.github.sanctum.labyrinth.library.HUID;
 import com.youtube.hempfest.clans.HempfestClans;
 import com.youtube.hempfest.clans.metadata.ClanMeta;
 import com.youtube.hempfest.clans.metadata.PersistentClan;
@@ -7,7 +8,6 @@ import com.youtube.hempfest.clans.util.construct.Clan;
 import com.youtube.hempfest.clans.util.data.Config;
 import com.youtube.hempfest.clans.util.data.ConfigType;
 import com.youtube.hempfest.clans.util.data.DataManager;
-import com.youtube.hempfest.hempcore.library.HUID;
 import com.youtube.hempfest.villages.ClansVillages;
 import com.youtube.hempfest.villages.apicore.activities.Invitation;
 import com.youtube.hempfest.villages.apicore.activities.Objective;
@@ -412,11 +412,7 @@ public class Village implements Serializable {
 	}
 
 	public void removeBuff(PotionEffectType type) {
-		for (PotionBuff b : instance.buffs) {
-			if (b.getEffect().getType().equals(type)) {
-				buffs.remove(b);
-			}
-		}
+		instance.buffs.removeIf(b -> b.getEffect().getType().equals(type));
 	}
 
 	public void removeBuff(PotionBuff buff) {

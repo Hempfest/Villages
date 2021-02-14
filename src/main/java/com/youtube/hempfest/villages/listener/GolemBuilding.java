@@ -1,12 +1,14 @@
 package com.youtube.hempfest.villages.listener;
 
 import com.google.common.collect.MapMaker;
+import com.youtube.hempfest.clans.HempfestClans;
 import com.youtube.hempfest.clans.util.construct.Clan;
 import com.youtube.hempfest.villages.ClansVillages;
 import com.youtube.hempfest.villages.apicore.activities.Objective;
 import com.youtube.hempfest.villages.apicore.entities.Inhabitant;
 import com.youtube.hempfest.villages.apicore.entities.Village;
 import com.youtube.hempfest.villages.events.VillageObjectiveLevelEvent;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -29,11 +31,19 @@ public class GolemBuilding implements Listener {
 			makeMap();
 
 	@EventHandler(priority = EventPriority.LOW)
-	public void onBlockPace(BlockPlaceEvent event) {
+	public void onBlockPace(BlockPlaceEvent event) throws Exception {
 		Player player = event.getPlayer();
 		Location location = event.getBlock().getLocation();
 		// Save the location of the last placed block
-		lastPlaced.put(player, location);
+		try {
+			Callable<Village> village = () -> ClansVillages.getVillageById(ClansVillages.getVillageId(HempfestClans.clanManager(player)));
+			Village v = village.call();
+			if (v != null) {
+				lastPlaced.put(player, location);
+			}
+		} catch (NullPointerException ignored) {
+
+		}
 	}
 
 	@EventHandler

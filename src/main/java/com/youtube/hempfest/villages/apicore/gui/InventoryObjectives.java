@@ -1,11 +1,10 @@
 package com.youtube.hempfest.villages.apicore.gui;
 
+import com.github.sanctum.labyrinth.Labyrinth;
+import com.github.sanctum.labyrinth.gui.GuiLibrary;
+import com.github.sanctum.labyrinth.gui.Pagination;
+import com.github.sanctum.labyrinth.library.HUID;
 import com.youtube.hempfest.clans.util.construct.Clan;
-import com.youtube.hempfest.hempcore.HempCore;
-import com.youtube.hempfest.hempcore.gui.GuiLibrary;
-import com.youtube.hempfest.hempcore.gui.Menu;
-import com.youtube.hempfest.hempcore.gui.Pagination;
-import com.youtube.hempfest.hempcore.library.HUID;
 import com.youtube.hempfest.villages.ClansVillages;
 import com.youtube.hempfest.villages.apicore.activities.Objective;
 import com.youtube.hempfest.villages.apicore.entities.Village;
@@ -42,7 +41,7 @@ public class InventoryObjectives extends Pagination {
 	public void handleMenu(InventoryClickEvent e) {
 		Player p = (Player) e.getWhoClicked();
 		Village v = ClansVillages.getVillageById(HUID.fromString(villageId));
-		String id = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(HempCore.getInstance(), "objective-id"), PersistentDataType.STRING);
+		String id = e.getCurrentItem().getItemMeta().getPersistentDataContainer().get(new NamespacedKey(Labyrinth.getInstance(), "objective-id"), PersistentDataType.STRING);
 		switch (e.getCurrentItem().getType()) {
 			case EMERALD:
 				p.closeInventory();

@@ -3,6 +3,7 @@ package com.youtube.hempfest.villages.events;
 import com.youtube.hempfest.clans.util.StringLibrary;
 import com.youtube.hempfest.clans.util.construct.Clan;
 import com.youtube.hempfest.clans.util.construct.ClanUtil;
+import com.youtube.hempfest.clans.util.data.Config;
 import com.youtube.hempfest.clans.util.listener.ClanEventBuilder;
 import com.youtube.hempfest.villages.ClansVillages;
 import com.youtube.hempfest.villages.apicore.activities.Objective;
@@ -10,6 +11,7 @@ import com.youtube.hempfest.villages.apicore.entities.Inhabitant;
 import com.youtube.hempfest.villages.apicore.entities.Village;
 import com.youtube.hempfest.villages.apicore.library.Permission;
 import com.youtube.hempfest.villages.apicore.library.Position;
+import java.io.InputStream;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
@@ -129,9 +131,19 @@ public class VillageAlarmDestructionEvent extends ClanEventBuilder implements Ca
 					getDestroyerVillage().sendMessage("&6&l" + destroyer.getName() + " &c&oHAS DESTROYED ANOTHER VILLAGES ALARM.");
 				}
 			}
+			ClansVillages.removeAlarm(village.getAlarm());
 			village.setAlarmLoc(null);
 			village.complete();
-			village.sendMessage(destroyer.getName() + " &c&ohas un-installed the village alarm.");
+			village.sendMessage(String.format(getMessage(), destroyer.getName()));
+	}
+
+	public String getMessage() {
+		Config data = Config.get("Messages", "Configuration/Villages");
+		if (!data.exists()) {
+			InputStream is = ClansVillages.getInstance().getResource("Messages.yml");
+			Config.copy(is, data.getFile());
+		}
+		return data.getConfig().getString("alarm-uninstall");
 	}
 
 }

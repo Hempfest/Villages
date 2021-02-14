@@ -1,0 +1,22 @@
+#  ██╗   ██╗██╗██╗     ██╗      █████╗  ██████╗ ███████╗███████╗
+#  ██║   ██║██║██║     ██║     ██╔══██╗██╔════╝ ██╔════╝██╔════╝
+#  ██║   ██║██║██║     ██║     ███████║██║  ███╗█████╗  ███████╗
+#  ╚██╗ ██╔╝██║██║     ██║     ██╔══██║██║   ██║██╔══╝  ╚════██║
+#   ╚████╔╝ ██║███████╗███████╗██║  ██║╚██████╔╝███████╗███████║
+#    ╚═══╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚══════╝
+# ===============================================================
+village-create: '&a%s declared a new village for %s'
+village-delete: '&c%s''s village has been abandoned.'
+village-near:
+  message-enter: '&e~ &3Village territory'
+  message-exit: '&e~ &bLeaving village territory'
+  title-enter: '&3Village &7[&6%s&7]'
+  sub-enter: '&f%s'
+  title-exit: '&4&nWilderness'
+  sub-exit: '&4&nWilderness'
+  send-title: true
+alarm-install: '&f%s &are-installed the village alarm.'
+alarm-uninstall: '&f%s &cun-installed the village alarm.'
+alarm-deny: '&c&oYour village already has an alarm.'
+
+

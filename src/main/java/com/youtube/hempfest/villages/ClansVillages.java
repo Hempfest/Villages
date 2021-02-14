@@ -1,15 +1,15 @@
 package com.youtube.hempfest.villages;
 
+import com.github.sanctum.labyrinth.command.CommandBuilder;
+import com.github.sanctum.labyrinth.event.EventBuilder;
+import com.github.sanctum.labyrinth.library.HFEncoded;
+import com.github.sanctum.labyrinth.library.HUID;
 import com.youtube.hempfest.clans.metadata.ClanMeta;
 import com.youtube.hempfest.clans.metadata.PersistentClan;
 import com.youtube.hempfest.clans.util.construct.Clan;
 import com.youtube.hempfest.clans.util.data.Config;
 import com.youtube.hempfest.clans.util.data.ConfigType;
 import com.youtube.hempfest.clans.util.data.DataManager;
-import com.youtube.hempfest.hempcore.command.CommandBuilder;
-import com.youtube.hempfest.hempcore.event.EventBuilder;
-import com.youtube.hempfest.hempcore.library.HFEncoded;
-import com.youtube.hempfest.hempcore.library.HUID;
 import com.youtube.hempfest.villages.apicore.entities.Inhabitant;
 import com.youtube.hempfest.villages.apicore.entities.Item;
 import com.youtube.hempfest.villages.apicore.entities.Village;
@@ -145,7 +145,7 @@ public final class ClansVillages extends JavaPlugin {
 	public static Village getVillageByAlarm(Location alarm) {
 		Village village = null;
 		for (Village v : villages) {
-			if (v.getAlarm().equals(alarm)) {
+			if (v.getAlarm()!= null && v.getAlarm().equals(alarm)) {
 				village = v;
 				break;
 			}
@@ -277,6 +277,15 @@ public final class ClansVillages extends JavaPlugin {
 
 	public List<Location> getAllAlarms() {
 		return alarms;
+	}
+
+	public static void removeAlarm(Location location) {
+		for (Location loc : alarms) {
+			if (loc.equals(location)) {
+				alarms.remove(loc);
+				break;
+			}
+		}
 	}
 
 

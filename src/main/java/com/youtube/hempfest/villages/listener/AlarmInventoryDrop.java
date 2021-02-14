@@ -18,7 +18,7 @@ public class AlarmInventoryDrop implements Listener {
 			Player p = (Player) e.getWhoClicked();
 			if (!(e.getInventory() instanceof CraftingInventory)) {
 				if (p.getGameMode().equals(GameMode.SURVIVAL)) {
-					if (i.hasItemMeta()) {
+					if (i.getItemMeta() != null) {
 						if (i.getItemMeta().hasDisplayName()) {
 							if (i.getItemMeta().getDisplayName().equals(Clan.clanUtil.color("&6&lVILLAGE ALARM"))) {
 								Clan.clanUtil.sendMessage((Player) e.getWhoClicked(), "&c&oYou cannot drop this item.");
